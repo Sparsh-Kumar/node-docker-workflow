@@ -73,8 +73,9 @@
 
   <div class="profile-container">
     <img src="/imgs/profileimg.png" alt="Profile Picture" id="profile-pic">
-    <input class="bold-text" type="text" id="name" readonly>
-    <input class="bold-text" type="text" id="email" readonly>
+    <input type="text" id="mongoId" hidden/>
+    <input class="bold-text" type="text" id="name" readonly/>
+    <input class="bold-text" type="text" id="email" readonly/>
     <button id="edit-button" onclick="toggleEdit()">Edit Details</button>
   </div>
 
@@ -88,9 +89,11 @@
           return response.json();
         })
         .then(data => {
-          const { data: { email, name } } = data;
+          const { data: { _id, email, name } } = data;
+          const idField = document.getElementById('mongoId');
           const nameField = document.getElementById('name');
           const emailField = document.getElementById('email');
+          idField.value = _id;
           nameField.value = name;
           emailField.value = email;
         })
@@ -100,6 +103,7 @@
     }
 
     function toggleEdit() {
+      const idField = document.getElementById('mongoId');
       const nameField = document.getElementById('name');
       const emailField = document.getElementById('email');
       const editButton = document.getElementById('edit-button');
@@ -116,9 +120,10 @@
         editButton.textContent = "Edit Details";
         nameField.classList.add('bold-text');
         emailField.classList.add('bold-text');
+        const idValue = idField.value;
         const nameValue = nameField.value;
         const emailValue = emailField.value;
-        fetch('http://localhost:9000/profile', {
+        fetch(`http://localhost:9000/profile/${idValue}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
@@ -135,8 +140,6 @@
           return response.json();
         })
         .then(data => {
-          console.log('Patch response data is');
-          console.log(data);
         })
         .catch(error => {
           console.log(`PATCH request failed: `, error);
