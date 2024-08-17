@@ -80,8 +80,9 @@
   </div>
 
   <script>
+    const apiUrl = 'http://134.209.144.193:9000';
     function getInitialValues() {
-      fetch('http://localhost:9000/profile')
+      fetch(`${apiUrl}/profile`)
         .then(response => {
           if (!response.ok) {
             throw new Error(`Network response was not ok ${response.statusText}`);
@@ -123,7 +124,7 @@
         const idValue = idField.value;
         const nameValue = nameField.value;
         const emailValue = emailField.value;
-        fetch(`http://localhost:9000/profile/${idValue}`, {
+        fetch(`${apiUrl}/profile/${idValue}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
