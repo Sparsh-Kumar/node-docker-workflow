@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    .profile-container {
+      text-align: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 300px;
+      width: 100%;
+    }
+
+    img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      border: none;
+      border-bottom: 1px solid #ccc;
+      padding: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 1em;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-bottom: 1px solid #333;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    button:focus {
+      outline: none;
+    }
+
+    .bold-text {
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="profile-container">
+    <img src="/imgs/profileimg.png" alt="Profile Picture" id="profile-pic">
+    <input class="bold-text" type="text" id="name" readonly>
+    <input class="bold-text" type="text" id="email" readonly>
+    <button id="edit-button" onclick="toggleEdit()">Edit Details</button>
+  </div>
+
+  <script>
+    function getInitialValues() {
+      fetch('http://localhost:9000/profile')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Network response was not ok ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          const { data: { email, name } } = data;
+          const nameField = document.getElementById('name');
+          const emailField = document.getElementById('email');
+          nameField.value = name;
+          emailField.value = email;
+        })
+        .catch(error => {
+          console.log(`GET request failed: `, error);
+        });
+    }
+
+    function toggleEdit() {
+      const nameField = document.getElementById('name');
+      const emailField = document.getElementById('email');
+      const editButton = document.getElementById('edit-button');
+
+      if (nameField.readOnly) {
+        nameField.readOnly = false;
+        emailField.readOnly = false;
+        editButton.textContent = "Save";
+        nameField.classList.remove('bold-text');
+        emailField.classList.remove('bold-text');
+      } else {
+        nameField.readOnly = true;
+        emailField.readOnly = true;
+        editButton.textContent = "Edit Details";
+        nameField.classList.add('bold-text');
+        emailField.classList.add('bold-text');
+        const nameValue = nameField.value;
+        const emailValue = emailField.value;
+        fetch('http://localhost:9000/profile', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: nameValue,
+            email: emailValue,
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Network response was not ok ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Patch response data is');
+          console.log(data);
+        })
+        .catch(error => {
+          console.log(`PATCH request failed: `, error);
+        });
+      }
+    }
+
+    window.onload = getInitialValues;
+
+  </script>
+
+</body>
+
+</html>
