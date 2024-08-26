@@ -1,4 +1,4 @@
-FROM node:13-alpine
+FROM node:22.7.0-alpine3.20
 
 ENV PORT=9000 \
     MONGODB_URI=mongodb://admin:password@134.209.144.193:27017 \
